@@ -7,20 +7,9 @@ namespace PouleR\LinkfireAPI\Entity;
  */
 class AccessToken
 {
-    /**
-     * @var string
-     */
-    private $accessToken = '';
-
-    /**
-     * @var int
-     */
-    private $expiresIn = 0;
-
-    /**
-     * @var string
-     */
-    private $tokenType = '';
+    private string $accessToken = '';
+    private int $expiresIn = 0;
+    private string $tokenType = '';
 
     /**
      * @return string
@@ -69,5 +58,4 @@ class AccessToken
     {
         $this->tokenType = $tokenType;
     }
-
 }

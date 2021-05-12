@@ -4,6 +4,7 @@ namespace PouleR\LinkfireAPI;
 
 use PouleR\LinkfireAPI\Entity\AccessToken;
 use PouleR\LinkfireAPI\Entity\BoardDomain;
+use PouleR\LinkfireAPI\Entity\CampaignLink;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -90,7 +91,6 @@ class LinkfireAPI
     public function getBoardDomains(string $boardId): array
     {
         $url = sprintf('/settings/boards/%s/domains', $boardId);
-
         $boardDomains = [];
 
         try {
@@ -109,6 +109,51 @@ class LinkfireAPI
     }
 
     /**
+     * @param string $boardId
+     * @param array  $params
+     *
+     * @return CampaignLink[]
+     */
+    public function getCampaignLinks(string $boardId, array $params = []): array
+    {
+        $allowedParameters = [
+            'artistId',
+            'creatorId',
+            'domainId',
+            'batchId',
+            'title',
+            'code',
+            'tag',
+            'createdDate',
+            'sort',
+            'page',
+            'pageSize'
+        ];
+
+        $links = [];
+        $filteredParameters = $this->filterQueryParameters($params, $allowedParameters);
+        $url = sprintf('/campaigns/boards/%s/links', $boardId);
+
+        if (count($filteredParameters)) {
+            $url .= sprintf('?%s', http_build_query($filteredParameters));
+        }
+
+        try {
+            $response = $this->client->apiRequest('GET', $url);
+
+            foreach ($response['data'] as $data) {
+                $links[] = $this->normalizer->denormalize($data, CampaignLink::class);
+            }
+
+            return $links;
+        } catch (\Exception | \Throwable $exception) {
+            $this->logError(__FUNCTION__, $exception);
+        }
+
+        return [];
+    }
+
+    /**
      * @param string     $method
      * @param \Exception $exception
      */
@@ -119,5 +164,22 @@ class LinkfireAPI
             'message' => $exception->getMessage(),
             'code' => $exception->getCode(),
         ]);
+    }
+
+    /**
+     * @param array $params
+     * @param array $allowedParameters
+     *
+     * @return array
+     */
+    private function filterQueryParameters(array $params, array $allowedParameters): array
+    {
+        return array_filter(
+            $params,
+            function ($key) use ($allowedParameters) {
+                return in_array($key, $allowedParameters);
+            },
+            ARRAY_FILTER_USE_KEY
+        );
     }
 }

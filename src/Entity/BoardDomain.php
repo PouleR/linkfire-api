@@ -7,20 +7,9 @@ namespace PouleR\LinkfireAPI\Entity;
  */
 class BoardDomain
 {
-    /**
-     * @var string
-     */
-    private $id = '';
-
-    /**
-     * @var string
-     */
-    private $name = '';
-
-    /**
-     * @var bool
-     */
-    private $isFavorite = false;
+    private string $id = '';
+    private string $name = '';
+    private bool $isFavorite = false;
 
     /**
      * @return string
