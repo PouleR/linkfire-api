@@ -2,22 +2,23 @@
 
 namespace PouleR\LinkfireAPI;
 
+use Exception;
 use PouleR\LinkfireAPI\Entity\AccessToken;
 use PouleR\LinkfireAPI\Entity\BoardDomain;
 use PouleR\LinkfireAPI\Entity\CampaignLink;
 use PouleR\LinkfireAPI\Entity\MediaService;
+use PouleR\LinkfireAPI\Entity\ScanningStatus;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Throwable;
 
 /**
  * Class LinkfireAPI
  */
 class LinkfireAPI
 {
-    private string $clientId = '';
-    private string $deviceId = '';
     protected LinkfireAPIClient $client;
     protected ?LoggerInterface $logger;
     protected ObjectNormalizer $normalizer;
@@ -58,7 +59,7 @@ class LinkfireAPI
             $response = $this->client->authenticate($clientId, $clientSecret);
 
             return $this->normalizer->denormalize($response, AccessToken::class);
-        } catch (\Exception | \Throwable $exception) {
+        } catch (Exception | Throwable $exception) {
             $this->logError(__FUNCTION__, $exception);
         }
 
@@ -83,7 +84,7 @@ class LinkfireAPI
             }
 
             return $boardDomains;
-        } catch (\Exception | \Throwable $exception) {
+        } catch (Exception | Throwable $exception) {
             $this->logError(__FUNCTION__, $exception);
         }
 
@@ -92,8 +93,9 @@ class LinkfireAPI
 
     /**
      * @param string $boardId
+     * @param array  $params
      *
-     * @return BoardDomain[]
+     * @return MediaService[]
      */
     public function getBoardMediaServices(string $boardId, array $params = []): array
     {
@@ -119,7 +121,40 @@ class LinkfireAPI
             }
 
             return $mediaServices;
-        } catch (\Exception | \Throwable $exception) {
+        } catch (Exception | Throwable $exception) {
+            $this->logError(__FUNCTION__, $exception);
+        }
+
+        return [];
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return MediaService[]
+     */
+    public function getAvailableMediaServices(array $params = []): array
+    {
+        $allowedParameters = [
+            'description',
+            'name',
+            'page',
+            'pageSize'
+        ];
+
+        $filteredParameters = $this->filterQueryParameters($params, $allowedParameters);
+        $mediaServices = [];
+
+        try {
+            $url = sprintf('/settings/mediaservices%s', count($filteredParameters) ? sprintf('?%s', http_build_query($filteredParameters)) : '');
+            $response = $this->client->apiRequest('GET', $url);
+
+            foreach ($response['data'] as $data) {
+                $mediaServices[] = $this->normalizer->denormalize($data, MediaService::class);
+            }
+
+            return $mediaServices;
+        } catch (Exception | Throwable $exception) {
             $this->logError(__FUNCTION__, $exception);
         }
 
@@ -164,7 +199,7 @@ class LinkfireAPI
             }
 
             return $links;
-        } catch (\Exception | \Throwable $exception) {
+        } catch (Exception | Throwable $exception) {
             $this->logError(__FUNCTION__, $exception);
         }
 
@@ -172,10 +207,33 @@ class LinkfireAPI
     }
 
     /**
-     * @param string     $method
-     * @param \Exception $exception
+     * @param string $boardId
+     * @param string $linkId
+     *
+     * @return null|ScanningStatus
      */
-    private function logError(string $method, \Exception $exception)
+    public function getScanningStatus(string $boardId, string $linkId): ?ScanningStatus
+    {
+        $url = sprintf('/campaigns/boards/%s/links/%s/scan/status', $boardId, $linkId);
+
+        try {
+            $response = $this->client->apiRequest('GET', $url);
+
+            return $this->normalizer->denormalize($response['data'], CampaignLink::class);
+        } catch (Exception | Throwable $exception) {
+            var_dump($exception->getMessage());
+
+            $this->logError(__FUNCTION__, $exception);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string     $method
+     * @param Exception $exception
+     */
+    private function logError(string $method, Exception $exception)
     {
         $this->logger->error('Error during API Request', [
             'method' => $method,
