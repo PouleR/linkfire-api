@@ -5,6 +5,7 @@ namespace PouleR\LinkfireAPI;
 use PouleR\LinkfireAPI\Entity\AccessToken;
 use PouleR\LinkfireAPI\Entity\BoardDomain;
 use PouleR\LinkfireAPI\Entity\CampaignLink;
+use PouleR\LinkfireAPI\Entity\MediaService;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -15,30 +16,11 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
  */
 class LinkfireAPI
 {
-    /**
-     * @var string
-     */
-    private $clientId = '';
-
-    /**
-     * @var string
-     */
-    private $deviceId = '';
-
-    /**
-     * @var LinkfireAPIClient
-     */
-    protected $client;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * @var ObjectNormalizer
-     */
-    protected $normalizer;
+    private string $clientId = '';
+    private string $deviceId = '';
+    protected LinkfireAPIClient $client;
+    protected ?LoggerInterface $logger;
+    protected ObjectNormalizer $normalizer;
 
     /**
      * @param LinkfireAPIClient    $client
@@ -101,6 +83,42 @@ class LinkfireAPI
             }
 
             return $boardDomains;
+        } catch (\Exception | \Throwable $exception) {
+            $this->logError(__FUNCTION__, $exception);
+        }
+
+        return [];
+    }
+
+    /**
+     * @param string $boardId
+     *
+     * @return BoardDomain[]
+     */
+    public function getBoardMediaServices(string $boardId, array $params = []): array
+    {
+        $allowedParameters = [
+            'page',
+            'pageSize'
+        ];
+
+        $filteredParameters = $this->filterQueryParameters($params, $allowedParameters);
+
+        $url = sprintf('/settings/boards/%s/mediaservices', $boardId);
+        if (count($filteredParameters)) {
+            $url .= sprintf('?%s', http_build_query($filteredParameters));
+        }
+
+        $mediaServices = [];
+
+        try {
+            $response = $this->client->apiRequest('GET', $url);
+
+            foreach ($response['data'] as $data) {
+                $mediaServices[] = $this->normalizer->denormalize($data, MediaService::class);
+            }
+
+            return $mediaServices;
         } catch (\Exception | \Throwable $exception) {
             $this->logError(__FUNCTION__, $exception);
         }
