@@ -15,10 +15,14 @@ class CampaignLink
     private string $code = '';
     private array $tags;
     private string $boardId = '';
+    private ?string $domainId = '';
     private \DateTime $created;
     private \DateTime $updated;
     private string $status = '';
     private bool $isScanning = false;
+
+    /** @var Locale[] */
+    private array $locales;
 
     /** @var Image[] */
     private array $images;
@@ -28,8 +32,8 @@ class CampaignLink
     private ?\DateTime $releaseDate;
     private string $mediaType = '';
     private ?string $subMediaType = '';
-    private string $title = '';
-    private string $description = '';
+    private ?string $title = '';
+    private ?string $description = '';
     private string $baseUrl = '';
     private ?string $fallbackUrl = '';
     private ?string $upc = '';
@@ -97,6 +101,22 @@ class CampaignLink
     public function setTags(array $tags): void
     {
         $this->tags = $tags;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDomainId(): ?string
+    {
+        return $this->domainId;
+    }
+
+    /**
+     * @param string|null $domainId
+     */
+    public function setDomainId(?string $domainId): void
+    {
+        $this->domainId = $domainId;
     }
 
     /**
@@ -185,6 +205,26 @@ class CampaignLink
     public function setIsScanning(bool $isScanning): void
     {
         $this->isScanning = $isScanning;
+    }
+
+    /**
+     * @return Locale[]
+     */
+    public function getLocales(): array
+    {
+        return $this->locales;
+    }
+
+    /**
+     * @param Locale[] $locales
+     */
+    public function setLocales(array $locales): void
+    {
+        $normalizer = new ObjectNormalizer(null, new CamelCaseToSnakeCaseNameConverter());
+
+        foreach ($locales as $locale) {
+            $this->locales[] = $normalizer->denormalize($locale, Locale::class);
+        }
     }
 
     /**
@@ -308,33 +348,33 @@ class CampaignLink
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
     /**
-     * @param string $title
+     * @param string|null $title
      */
-    public function setTitle(string $title): void
+    public function setTitle(?string $title): void
     {
         $this->title = $title;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
     /**
-     * @param string $description
+     * @param string|null $description
      */
-    public function setDescription(string $description): void
+    public function setDescription(?string $description): void
     {
         $this->description = $description;
     }

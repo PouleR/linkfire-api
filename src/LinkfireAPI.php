@@ -101,10 +101,10 @@ class LinkfireAPI
     {
         $allowedParameters = [
             'page',
-            'pageSize'
+            'pageSize',
         ];
 
-        $filteredParameters = $this->filterQueryParameters($params, $allowedParameters);
+        $filteredParameters = $this->filterAllowedParameters($params, $allowedParameters);
 
         $url = sprintf('/settings/boards/%s/mediaservices', $boardId);
         if (count($filteredParameters)) {
@@ -139,10 +139,10 @@ class LinkfireAPI
             'description',
             'name',
             'page',
-            'pageSize'
+            'pageSize',
         ];
 
-        $filteredParameters = $this->filterQueryParameters($params, $allowedParameters);
+        $filteredParameters = $this->filterAllowedParameters($params, $allowedParameters);
         $mediaServices = [];
 
         try {
@@ -165,6 +165,58 @@ class LinkfireAPI
      * @param string $boardId
      * @param array  $params
      *
+     * @return CampaignLink|null
+     */
+    public function createCampaignLink(string $boardId, array $params = []): ?CampaignLink
+    {
+        $allowedParameters = [
+            'externalId',
+            'artist',
+            'artistAlternative',
+            'album',
+            'albumAlternative',
+            'track',
+            'trackAlternative',
+            'distributor',
+            'genre',
+            'duration',
+            'image',
+            'playList',
+            'creator',
+            'baseUrl',
+            'upc',
+            'isrc',
+            'service',
+            'isoCode',
+            'mediaType',
+            'subMediaType',
+            'title',
+            'code',
+            'tags',
+            'domainId',
+            'audio',
+            'video',
+            'skipSearch',
+            'skipMetadataSearch',
+            'locales',
+        ];
+
+        try {
+            $filteredParameters = $this->filterAllowedParameters($params, $allowedParameters);
+            $response = $this->client->apiRequest('POST', sprintf('/campaigns/boards/%s/links', $boardId), ['Content-Type' => 'application/json'], json_encode($filteredParameters));
+
+            return $this->normalizer->denormalize($response['data'], CampaignLink::class);
+        } catch (Exception | Throwable $exception) {
+            $this->logError(__FUNCTION__, $exception);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $boardId
+     * @param array  $params
+     *
      * @return CampaignLink[]
      */
     public function getCampaignLinks(string $boardId, array $params = []): array
@@ -180,11 +232,11 @@ class LinkfireAPI
             'createdDate',
             'sort',
             'page',
-            'pageSize'
+            'pageSize',
         ];
 
         $links = [];
-        $filteredParameters = $this->filterQueryParameters($params, $allowedParameters);
+        $filteredParameters = $this->filterAllowedParameters($params, $allowedParameters);
         $url = sprintf('/campaigns/boards/%s/links', $boardId);
 
         if (count($filteredParameters)) {
@@ -210,6 +262,25 @@ class LinkfireAPI
      * @param string $boardId
      * @param string $linkId
      *
+     * @return CampaignLink
+     */
+    public function getCampaignLinkById(string $boardId, string $linkId): ?CampaignLink
+    {
+        try {
+            $response = $this->client->apiRequest('GET', sprintf('/campaigns/boards/%s/links/%s', $boardId, $linkId));
+
+            return $this->normalizer->denormalize($response['data'], CampaignLink::class);
+        } catch (Exception | Throwable $exception) {
+            $this->logError(__FUNCTION__, $exception);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $boardId
+     * @param string $linkId
+     *
      * @return null|ScanningStatus
      */
     public function getScanningStatus(string $boardId, string $linkId): ?ScanningStatus
@@ -219,10 +290,8 @@ class LinkfireAPI
         try {
             $response = $this->client->apiRequest('GET', $url);
 
-            return $this->normalizer->denormalize($response['data'], CampaignLink::class);
+            return $this->normalizer->denormalize($response['data'], ScanningStatus::class);
         } catch (Exception | Throwable $exception) {
-            var_dump($exception->getMessage());
-
             $this->logError(__FUNCTION__, $exception);
         }
 
@@ -230,7 +299,7 @@ class LinkfireAPI
     }
 
     /**
-     * @param string     $method
+     * @param string    $method
      * @param Exception $exception
      */
     private function logError(string $method, Exception $exception)
@@ -248,7 +317,7 @@ class LinkfireAPI
      *
      * @return array
      */
-    private function filterQueryParameters(array $params, array $allowedParameters): array
+    private function filterAllowedParameters(array $params, array $allowedParameters): array
     {
         return array_filter(
             $params,
