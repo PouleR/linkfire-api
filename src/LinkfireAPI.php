@@ -299,6 +299,40 @@ class LinkfireAPI
     }
 
     /**
+     * @param string $boardId
+     * @param array  $campaignLinks
+     * @param array  $params
+     *
+     * @return bool
+     */
+    public function rescanCampaignLinks(string $boardId, array $campaignLinks, array $params = [])
+    {
+        $allowedParameters = [
+            'rescanOptions.mediaSamples',
+            'rescanOptions.metadata',
+            'rescanOptions.socialCard',
+            'rescanOptions.serviceDestinations',
+            'rescanOptions.landingPageArtwork',
+        ];
+
+        try {
+            $filteredParameters = $this->filterAllowedParameters($params, $allowedParameters);
+            $url = sprintf('/campaigns/boards/%s/links/rescan', $boardId);
+            if (count($filteredParameters)) {
+                $url .= sprintf('?%s', urlencode(http_build_query($filteredParameters)));
+            }
+
+            $response = $this->client->apiRequest('POST', $url, ['Content-Type' => 'application/json'], json_encode($campaignLinks));
+
+            return !is_null($response);
+        } catch (Exception | Throwable $exception) {
+            $this->logError(__FUNCTION__, $exception);
+        }
+
+        return false;
+    }
+
+    /**
      * @param string    $method
      * @param Exception $exception
      */
