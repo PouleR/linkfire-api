@@ -7,58 +7,58 @@ namespace PouleR\LinkfireAPI\Entity;
  */
 class MediaServiceLink
 {
-    private string $mediaServiceTitle = '';
-    private string $mediaServiceName = '';
-    private string $mediaServiceId = '';
+    private ?string $mediaServiceTitle = '';
+    private ?string $mediaServiceName = '';
+    private ?string $mediaServiceId = '';
     private int $matchScore = 0;
     private ?string $url = '';
-    private string $status = '';
+    private ?string $status = '';
     private bool $enabled = false;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getMediaServiceTitle(): string
+    public function getMediaServiceTitle(): ?string
     {
         return $this->mediaServiceTitle;
     }
 
     /**
-     * @param string $mediaServiceTitle
+     * @param string|null $mediaServiceTitle
      */
-    public function setMediaServiceTitle(string $mediaServiceTitle): void
+    public function setMediaServiceTitle(?string $mediaServiceTitle): void
     {
         $this->mediaServiceTitle = $mediaServiceTitle;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getMediaServiceName(): string
+    public function getMediaServiceName(): ?string
     {
         return $this->mediaServiceName;
     }
 
     /**
-     * @param string $mediaServiceName
+     * @param string|null $mediaServiceName
      */
-    public function setMediaServiceName(string $mediaServiceName): void
+    public function setMediaServiceName(?string $mediaServiceName): void
     {
         $this->mediaServiceName = $mediaServiceName;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getMediaServiceId(): string
+    public function getMediaServiceId(): ?string
     {
         return $this->mediaServiceId;
     }
 
     /**
-     * @param string $mediaServiceId
+     * @param string|null $mediaServiceId
      */
-    public function setMediaServiceId(string $mediaServiceId): void
+    public function setMediaServiceId(?string $mediaServiceId): void
     {
         $this->mediaServiceId = $mediaServiceId;
     }
@@ -96,17 +96,17 @@ class MediaServiceLink
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getStatus(): string
+    public function getStatus(): ?string
     {
         return $this->status;
     }
 
     /**
-     * @param string $status
+     * @param string|null $status
      */
-    public function setStatus(string $status): void
+    public function setStatus(?string $status): void
     {
         $this->status = $status;
     }
