@@ -9,5 +9,5 @@ jobs:
       - uses: php-actions/composer@v5
       - name: Run PHPCS
         run: ./vendor/bin/phpcs src -v --standard=PSR2 --exclude=Generic.Files.LineLength
-#      - name: Run PHPUnit
-#        run: ./vendor/bin/phpunit --coverage-text --colors
+      - name: Run PHPUnit
+        run: ./vendor/bin/phpunit --coverage-text --colors
