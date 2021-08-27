@@ -217,7 +217,7 @@ class CampaignLink
     }
 
     /**
-     * @param Locale[] $locales
+     * @param array $locales
      */
     public function setLocales(array $locales): void
     {
@@ -237,7 +237,7 @@ class CampaignLink
     }
 
     /**
-     * @param Image[] $images
+     * @param array $images
      */
     public function setImages(array $images): void
     {

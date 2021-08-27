@@ -22,7 +22,7 @@ class Locale
     }
 
     /**
-     * @param MediaServiceLink[] $mediaServices
+     * @param array $mediaServices
      */
     public function setMediaServices(array $mediaServices): void
     {
