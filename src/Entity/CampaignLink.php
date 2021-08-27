@@ -2,6 +2,7 @@
 
 namespace PouleR\LinkfireAPI\Entity;
 
+use DateTime;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
@@ -13,23 +14,23 @@ class CampaignLink
     private string $id = '';
     private string $url = '';
     private string $code = '';
-    private array $tags;
+    private array $tags = [];
     private string $boardId = '';
     private ?string $domainId = '';
-    private \DateTime $created;
-    private \DateTime $updated;
+    private DateTime $created;
+    private DateTime $updated;
     private string $status = '';
     private bool $isScanning = false;
 
     /** @var Locale[] */
-    private array $locales;
+    private array $locales = [];
 
     /** @var Image[] */
-    private array $images;
+    private array $images = [];
     private ?string $audio = '';
     private ?string $video = '';
     private ?string $externalId = '';
-    private ?\DateTime $releaseDate;
+    private ?DateTime $releaseDate = null;
     private string $mediaType = '';
     private ?string $subMediaType = '';
     private ?string $title = '';
@@ -136,40 +137,40 @@ class CampaignLink
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime
      */
-    public function getCreated(): \DateTime
+    public function getCreated(): DateTime
     {
         return $this->created;
     }
 
     /**
-     * @param \DateTime|string $created
+     * @param DateTime|string $created
      */
     public function setCreated($created): void
     {
         if (is_string($created)) {
-            $created = new \DateTime($created);
+            $created = new DateTime($created);
         }
 
         $this->created = $created;
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime
      */
-    public function getUpdated(): \DateTime
+    public function getUpdated(): DateTime
     {
         return $this->updated;
     }
 
     /**
-     * @param \DateTime|string $updated
+     * @param DateTime|string $updated
      */
     public function setUpdated($updated): void
     {
         if (is_string($updated)) {
-            $updated = new \DateTime($updated);
+            $updated = new DateTime($updated);
         }
 
         $this->updated = $updated;
@@ -296,20 +297,20 @@ class CampaignLink
     }
 
     /**
-     * @return \DateTime|null
+     * @return DateTime|null
      */
-    public function getReleaseDate(): ?\DateTime
+    public function getReleaseDate(): ?DateTime
     {
         return $this->releaseDate;
     }
 
     /**
-     * @param \DateTime|string|null $releaseDate
+     * @param DateTime|string|null $releaseDate
      */
     public function setReleaseDate($releaseDate): void
     {
         if (is_string($releaseDate)) {
-            $releaseDate = new \DateTime($releaseDate);
+            $releaseDate = new DateTime($releaseDate);
         }
 
         $this->releaseDate = $releaseDate;

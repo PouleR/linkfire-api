@@ -11,7 +11,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 class Locale
 {
     /** @var MediaServiceLink[] */
-    private array $mediaServices;
+    private array $mediaServices = [];
 
     /**
      * @return MediaServiceLink[]
